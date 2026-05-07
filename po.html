@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>플코 | 노후 재무 시뮬레이터</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f3ff;
+      color: #333;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #ffe1ec, #e8ddff);
+      border-radius: 28px;
+      padding: 36px;
+      margin-bottom: 28px;
+      box-shadow: 0 10px 30px rgba(120, 90, 160, 0.12);
+    }
+
+    .hero h1 {
+      margin: 0 0 12px;
+      font-size: 34px;
+      color: #5f4b8b;
+    }
+
+    .hero p {
+      margin: 0;
+      line-height: 1.7;
+      color: #5f5a66;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 24px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: 0 8px 24px rgba(120, 90, 160, 0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #6a5acd;
+    }
+
+    label {
+      display: block;
+      margin: 18px 0 8px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #ddd6f3;
+      border-radius: 14px;
+      font-size: 15px;
+      outline: none;
+      background: #fffbff;
+    }
+
+    input:focus {
+      border-color: #b7a8ff;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 15px;
+      border: none;
+      border-radius: 16px;
+      background: #ff9fbc;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(255, 159, 188, 0.35);
+    }
+
+    button:hover {
+      background: #ff89ad;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .mini-card {
+      background: #faf7ff;
+      border-radius: 18px;
+      padding: 18px;
+      border: 1px solid #eee6ff;
+    }
+
+    .mini-card .title {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 8px;
+    }
+
+    .mini-card .value {
+      font-size: 22px;
+      font-weight: bold;
+      color: #5f4b8b;
+    }
+
+    .insight {
+      background: #fff7fb;
+      border: 1px solid #ffd6e5;
+      border-radius: 22px;
+      padding: 22px;
+      margin-top: 20px;
+      line-height: 1.8;
+    }
+
+    .insight h3 {
+      margin-top: 0;
+      color: #ff7fa3;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .safe {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .caution {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .danger {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .bars {
+      margin-top: 22px;
+    }
+
+    .bar-box {
+      margin: 18px 0;
+    }
+
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .bar-bg {
+      height: 16px;
+      background: #eee9fb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: #b7a8ff;
+      width: 0%;
+      transition: width 0.5s;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #777;
+      margin-top: 18px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 850px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>🌱 플코: 100세 시대 노후 재무 시뮬레이터</h1>
+      <p>
+        현재의 소득, 자산, 저축 수준을 바탕으로 은퇴 시점의 자산과 생활비를 예측하고,
+        국민연금과 물가 상승을 함께 고려해 노후 준비 상태를 보여주는 데이터 기반 재무 의사결정 지원 서비스입니다.
+      </p>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2>내 정보 입력하기</h2>
+
+        <label>현재 나이</label>
+        <input type="number" id="age" value="22" />
+
+        <label>은퇴 희망 나이</label>
+        <input type="number" id="retireAge" value="65" />
+
+        <label>월 소득 (원)</label>
+        <input type="number" id="income" value="3000000" />
+
+        <label>현재 자산 (원)</label>
+        <input type="number" id="asset" value="10000000" />
+
+        <label>월 저축액 (원)</label>
+        <input type="number" id="saving" value="500000" />
+
+        <label>현재 월 생활비 (원)</label>
+        <input type="number" id="livingCost" value="1500000" />
+
+        <label>국민연금 예상 가입기간 (년)</label>
+        <input type="number" id="pensionYears" value="30" />
+
+        <button onclick="calculate()">내 노후 준비 상태 보기</button>
+
+        <p class="note">
+          ※ 현재 버전은 DB 연결 전 프로토타입입니다. 실제 구현 시 SQLite의 CPI, 기준금리, 국민연금 테이블에서 값을 조회하도록 연결하면 됩니다.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>결과 리포트</h2>
+
+        <div id="statusBadge" class="status caution">🟡 입력 후 분석 대기</div>
+
+        <div class="result-grid">
+          <div class="mini-card">
+            <div class="title">65세 예상 자산</div>
+            <div class="value" id="futureAsset">-</div>
+          </div>
+          <div class="mini-card">
+            <div class="title">예상 국민연금</div>
+            <div class="value" id="pension">-</div>
+          </div>
+          <div class="mini-card">
+            <div class="title">은퇴 시점 월 생활비</div>
+            <div class="value" id="futureCost">-</div>
+          </div>
+          <div class="mini-card">
+            <div class="title">자산 소진 예상 나이</div>
+            <div class="value" id="depletionAge">-</div>
+          </div>
+        </div>
+
+        <div class="bars">
+          <div class="bar-box">
+            <div class="bar-label">
+              <span>국민연금 생활비 충당률</span>
+              <span id="pensionCoverageText">-</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" id="pensionCoverageBar"></div></div>
+          </div>
+
+          <div class="bar-box">
+            <div class="bar-label">
+              <span>100세까지 준비율</span>
+              <span id="retirementReadinessText">-</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" id="retirementReadinessBar"></div></div>
+          </div>
+        </div>
+
+        <div class="insight">
+          <h3>💡 플코 인사이트</h3>
+          <div id="insightText">
+            정보를 입력하면, 플코가 현재 준비 상태를 바탕으로 미래 생활비와 자산 흐름을 분석해드릴게요.
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // ===============================
+    // DB 연결 전 임시 데이터
+    // 실제 구현에서는 SQLite에서 조회한 값으로 대체
+    // ===============================
+
+    const cpiData = {
+      2026: 119.35,
+      2030: 129.18,
+      2040: 153.34,
+      2050: 177.60,
+      2060: 201.85,
+      2070: 226.10,
+      2080: 250.36
+    };
+
+    const pensionData = [
+      { income: 400000, years: 10, pension: 193150 },
+      { income: 1000000, years: 20, pension: 450800 },
+      { income: 1500000, years: 30, pension: 756820 },
+      { income: 2000000, years: 30, pension: 837450 },
+      { income: 3000000, years: 30, pension: 998000 },
+      { income: 4000000, years: 30, pension: 1150000 },
+      { income: 5000000, years: 30, pension: 1300000 }
+    ];
+
+    function formatWon(value) {
+      if (!isFinite(value)) return '-';
+      if (value >= 100000000) {
+        return (value / 100000000).toFixed(1) + '억 원';
+      }
+      return Math.round(value / 10000).toLocaleString() + '만 원';
+    }
+
+    function getCpiByYear(year) {
+      const availableYears = Object.keys(cpiData).map(Number);
+      let closestYear = availableYears[0];
+
+      availableYears.forEach(y => {
+        if (Math.abs(y - year) < Math.abs(closestYear - year)) {
+          closestYear = y;
+        }
+      });
+
+      return cpiData[closestYear];
+    }
+
+    function getExpectedPension(income, years) {
+      let best = pensionData[0];
+      let bestScore = Infinity;
+
+      pensionData.forEach(row => {
+        const score = Math.abs(row.income - income) / 100000 + Math.abs(row.years - years) * 5;
+        if (score < bestScore) {
+          bestScore = score;
+          best = row;
+        }
+      });
+
+      return best.pension;
+    }
+
+    function calculateFutureAsset(asset, monthlySaving, years, annualRate) {
+      let result = asset;
+      for (let i = 0; i < years; i++) {
+        result = result * (1 + annualRate) + monthlySaving * 12;
+      }
+      return result;
+    }
+
+    function calculateRequiredGrowthRate(asset, monthlySaving, years, targetAsset) {
+      let low = 0;
+      let high = 0.2;
+
+      for (let i = 0; i < 60; i++) {
+        const mid = (low + high) / 2;
+        const future = calculateFutureAsset(asset, monthlySaving, years, mid);
+        if (future < targetAsset) low = mid;
+        else high = mid;
+      }
+      return high * 100;
+    }
+
+    function calculate() {
+      const currentYear = 2026;
+      const age = Number(document.getElementById('age').value);
+      const retireAge = Number(document.getElementById('retireAge').value);
+      const income = Number(document.getElementById('income').value);
+      const asset = Number(document.getElementById('asset').value);
+      const saving = Number(document.getElementById('saving').value);
+      const livingCost = Number(document.getElementById('livingCost').value);
+      const pensionYears = Number(document.getElementById('pensionYears').value);
+
+      const yearsToRetire = retireAge - age;
+      const retireYear = currentYear + yearsToRetire;
+      const currentCpi = getCpiByYear(currentYear);
+      const retireCpi = getCpiByYear(retireYear);
+
+      // 기준금리 기반 임시 평균 성장률: 2.5%
+      // 실제 구현에서는 ratefull 테이블의 연도별 base_rate를 활용해 매년 복리 계산
+      const baseRate = 0.025;
+
+      const futureMonthlyCost = livingCost * (retireCpi / currentCpi);
+      const expectedPension = getExpectedPension(income, pensionYears);
+      const futureAsset = calculateFutureAsset(asset, saving, yearsToRetire, baseRate);
+
+      const monthlyGap = futureMonthlyCost - expectedPension;
+      const yearsAfterRetire = 100 - retireAge;
+      const totalNeededAfterRetire = Math.max(monthlyGap, 0) * 12 * yearsAfterRetire;
+
+      let depletionAge;
+      if (monthlyGap <= 0) {
+        depletionAge = 100;
+      } else {
+        const monthsCanCover = futureAsset / monthlyGap;
+        depletionAge = Math.min(100, Math.floor(retireAge + monthsCanCover / 12));
+      }
+
+      const pensionCoverage = Math.min(100, expectedPension / futureMonthlyCost * 100);
+      const readiness = totalNeededAfterRetire === 0 ? 100 : Math.min(100, futureAsset / totalNeededAfterRetire * 100);
+      const requiredGrowth = calculateRequiredGrowthRate(asset, saving, yearsToRetire, totalNeededAfterRetire);
+
+      document.getElementById('futureAsset').innerText = formatWon(futureAsset);
+      document.getElementById('pension').innerText = '월 ' + formatWon(expectedPension);
+      document.getElementById('futureCost').innerText = '월 ' + formatWon(futureMonthlyCost);
+      document.getElementById('depletionAge').innerText = depletionAge >= 100 ? '100세 이상' : depletionAge + '세 전후';
+
+      document.getElementById('pensionCoverageText').innerText = pensionCoverage.toFixed(1) + '%';
+      document.getElementById('pensionCoverageBar').style.width = pensionCoverage + '%';
+
+      document.getElementById('retirementReadinessText').innerText = readiness.toFixed(1) + '%';
+      document.getElementById('retirementReadinessBar').style.width = readiness + '%';
+
+      const badge = document.getElementById('statusBadge');
+      let insight = '';
+
+      if (readiness >= 85) {
+        badge.className = 'status safe';
+        badge.innerText = '🟢 안정 단계';
+        insight = `
+          현재 저축 흐름과 기준금리 기반 자산 성장을 고려했을 때, 은퇴 이후 생활비 부족분을 비교적 안정적으로 감당할 가능성이 있습니다.<br><br>
+          예상 국민연금은 은퇴 시점 생활비의 약 <b>${pensionCoverage.toFixed(1)}%</b>를 충당합니다.
+          나머지는 개인 자산과 저축으로 보완하는 구조입니다.<br><br>
+          다만 물가 상승은 장기간 누적될수록 부담이 커지기 때문에, 현재 저축 습관을 유지하는 것이 중요합니다.
+        `;
+      } else if (readiness >= 60) {
+        badge.className = 'status caution';
+        badge.innerText = '🟡 주의 단계';
+        insight = `
+          현재 노후 준비 수준은 <b>주의 단계</b>입니다.<br><br>
+          지금 월 생활비 ${formatWon(livingCost)} 수준은 은퇴 시점에 약 <b>${formatWon(futureMonthlyCost)}</b>까지 증가할 수 있습니다.
+          국민연금은 그중 약 <b>${pensionCoverage.toFixed(1)}%</b>를 충당할 것으로 예상됩니다.<br><br>
+          현재 흐름을 유지하면 자산은 <b>${depletionAge}세 전후</b>에 소진될 가능성이 있습니다.
+          100세까지 현재 생활 수준을 유지하려면 연평균 약 <b>${requiredGrowth.toFixed(1)}%</b> 수준의 자산 성장이 필요합니다.
+        `;
+      } else {
+        badge.className = 'status danger';
+        badge.innerText = '🔴 위험 단계';
+        insight = `
+          현재 저축 수준으로는 은퇴 후 실질 구매력이 감소할 가능성이 큽니다.<br><br>
+          가장 큰 원인은 <b>물가 상승에 비해 자산 성장 속도가 충분하지 않다는 점</b>입니다.
+          예상 국민연금은 은퇴 시점 생활비의 약 <b>${pensionCoverage.toFixed(1)}%</b>만 충당합니다.<br><br>
+          현재 생활 수준을 100세까지 유지하려면 연평균 약 <b>${requiredGrowth.toFixed(1)}%</b>의 자산 성장이 필요합니다.
+          월 저축액을 늘리거나, 장기적인 재무 전략을 세우는 것이 필요합니다.
+        `;
+      }
+
+      document.getElementById('insightText').innerHTML = insight;
+    }
+  </script>
+</body>
+</html>
